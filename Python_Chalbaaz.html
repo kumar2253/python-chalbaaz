@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python Chalbaaz</title>
+<style>
+body{font-family:Arial,sans-serif;text-align:center;background:#eef2f5;margin:0;padding:16px}
+#arena{position:relative;height:420px;max-width:650px;margin:15px auto;background:#dce4e8;border:2px solid #555;border-radius:20px;overflow:hidden}
+.person{position:absolute;text-align:center;font-size:38px;user-select:none}
+.person small{display:block;font-size:12px;font-weight:bold}
+#snake{position:absolute;font-size:50px;z-index:5;transition:left .08s linear,top .08s linear}
+button{padding:12px 18px;margin:4px;border:0;border-radius:10px;font-weight:bold}
+</style>
+</head>
+<body>
+<h1>🐍 Python Chalbaaz</h1>
+<p>Roam around and sting the fictional office characters!</p>
+<div>🐍 Stings: <b id="score">0</b>　⏱️ <b id="time">45</b>s</div>
+<div id="arena"></div>
+<p id="msg">Press START</p>
+<button onclick="startGame()">START 🐍</button><br>
+<button onclick="move(0,-1)">⬆️</button><br>
+<button onclick="move(-1,0)">⬅️</button>
+<button onclick="move(1,0)">➡️</button><br>
+<button onclick="move(0,1)">⬇️</button>
+<script>
+const arena=document.getElementById("arena");
+const names=[["😎","Boss"],["🤓","Analyst"],["💼","Manager"],["😏","Rival"],["🧑‍💻","Coder"],["📊","Lead"]];
+let snake,people=[],x=20,y=340,score=0,time=45,running=false,timer;
+function place(p){p.style.left=Math.random()*(arena.clientWidth-70)+"px";p.style.top=(40+Math.random()*(arena.clientHeight-90))+"px"}
+function setup(){
+ arena.innerHTML="";
+ people=[];
+ names.forEach(n=>{let p=document.createElement("div");p.className="person";p.innerHTML=n[0]+"<small>"+n[1]+"</small>";arena.appendChild(p);place(p);people.push(p)});
+ snake=document.createElement("div");snake.id="snake";snake.textContent="🐍";arena.appendChild(snake);render();
+}
+function render(){snake.style.left=x+"px";snake.style.top=y+"px"}
+function move(dx,dy){
+ if(!running)return;
+ x=Math.max(0,Math.min(arena.clientWidth-55,x+dx*18));
+ y=Math.max(30,Math.min(arena.clientHeight-65,y+dy*18));
+ render();
+ people.forEach(p=>{
+  if(p.dataset.hit)return;
+  let px=parseFloat(p.style.left),py=parseFloat(p.style.top);
+  if(Math.hypot(x-px,y-py)<55){
+   p.dataset.hit="1";score++;document.getElementById("score").textContent=score;
+   document.getElementById("msg").textContent="🐍 STING! "+p.querySelector("small").textContent+" got caught!";
+   setTimeout(()=>{p.removeAttribute("data-hit");place(p)},500);
+  }
+ });
+}
+document.addEventListener("keydown",e=>{
+ if(e.key==="ArrowUp")move(0,-1);if(e.key==="ArrowDown")move(0,1);
+ if(e.key==="ArrowLeft")move(-1,0);if(e.key==="ArrowRight")move(1,0);
+});
+function startGame(){
+ setup();score=0;time=45;running=true;
+ document.getElementById("score").textContent=0;document.getElementById("time").textContent=45;
+ document.getElementById("msg").textContent="🐍 Find someone to sting!";
+ clearInterval(timer);
+ timer=setInterval(()=>{time--;document.getElementById("time").textContent=time;
+ if(time<=0){clearInterval(timer);running=false;document.getElementById("msg").textContent="🏆 Game Over! Stings: "+score}},1000);
+}
+setup();
+</script>
+</body>
+</html>
